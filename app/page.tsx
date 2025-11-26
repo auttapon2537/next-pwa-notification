@@ -137,10 +137,23 @@ export default function Home() {
     options?: NotifyOptions,
   ) => {
     await ensurePermission();
+    // ใช้ service worker ถ้ามี เพื่อให้ทำงานได้ใน production/bgc
+    if (swSupported) {
+      const reg = await ensureRegistration();
+      await reg.showNotification(title, {
+        icon: "/icon-192.png",
+        badge: "/icon-192.png",
+        lang: "th",
+        ...options,
+      });
+      setLastMessage(`ส่งแจ้งเตือน (ผ่าน SW): ${title}`);
+      return;
+    }
+
+    // fallback กรณีไม่มี SW (dev บางกรณี)
     new Notification(title, {
       icon: "/icon-192.png",
       lang: "th",
-      tag: options?.tag,
       ...options,
     });
     setLastMessage(`ส่งแจ้งเตือน: ${title}`);
