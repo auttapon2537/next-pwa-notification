@@ -285,6 +285,42 @@ export default function Home() {
       },
       tone: "pink",
     },
+    {
+      title: "แจ้งเตือนเมื่อออกจากหน้า (หน่วง 3 วิ)",
+      description:
+        "ถ้าแท็บยังโฟกัสอยู่จะไม่แจ้งเตือน แต่ถ้าออกจากหน้าใน 3 วินาทีถัดไปจะยิงผ่าน service worker",
+      action: async () => {
+        await ensurePermission();
+        setLastMessage("จะตรวจสภาพหน้าจอใน 3 วินาที...");
+        setTimeout(async () => {
+          try {
+            if (
+              typeof document !== "undefined" &&
+              document.visibilityState === "visible" &&
+              document.hasFocus()
+            ) {
+              setLastMessage("ยังอยู่ในหน้าแอป จึงไม่แจ้งเตือน");
+              return;
+            }
+
+            const reg = await ensureRegistration();
+            await reg.showNotification("กลับมาดูแอปได้เลย", {
+              body: "คุณออกจากหน้าแอปเมื่อครู่",
+              icon: "/icon-192.png",
+              badge: "/icon-192.png",
+              tag: "delayed-focus-check",
+              data: { url: "/" },
+            });
+            setLastMessage("แจ้งเตือนเพราะคุณออกจากหน้าแอป");
+          } catch (error) {
+            setLastMessage(
+              error instanceof Error ? error.message : "แจ้งเตือนไม่สำเร็จ",
+            );
+          }
+        }, 3000);
+      },
+      tone: "amber",
+    },
   ];
 
   return (
