@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Next.js PWA Notifications Playground
 
-## Getting Started
+ตัวอย่าง Progressive Web App ที่มี service worker, manifest, ไอคอน และเดโมการแจ้งเตือนหลายแบบ (client, service worker, actions, badge/vibrate, ตั้งเวลา/จำลอง push)
 
-First, run the development server:
-
+## รันโปรเจ็กต์
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev         # โหมดพัฒนา http://localhost:3000
+npm run build && npm run start   # โปรดเลือกพอร์ตว่าง ถ้า 3000 ถูกใช้ให้ตั้ง PORT=3001
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ใช้งานเดโมการแจ้งเตือน
+- เปิดบน `http://localhost` หรือ HTTPS เท่านั้น (Notification API ถูกบล็อกบน HTTP ปกติ)
+- เมื่อโหลดหน้าแรก จะมีสถานะ Permission / Service Worker / Manifest ให้ดู
+- กด Allow Notifications ในเบราว์เซอร์ ถ้าเคย Block ต้องเข้า Site settings แล้วเปลี่ยนเป็น Allow
+- ปุ่มเดโม:
+  - แจ้งเตือนทันที (client) / พร้อมภาพ
+  - แจ้งเตือนผ่าน service worker (คงอยู่แม้ย่อแท็บ)
+  - แจ้งเตือนมีปุ่ม action (เปิดแอป/เลื่อน)
+  - Badge + vibrate pattern
+  - ตั้งเวลา/จำลอง push ด้วย postMessage -> service worker
+- ตรวจสอบ service worker: DevTools → Application → Service Workers ต้องเห็น `sw.js` เป็น activated
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## โครงสร้าง PWA
+- `app/manifest.ts` - ข้อมูลแอป, icons, theme color
+- `public/icon-192.png`, `public/icon-512.png` - ไอคอนสำหรับติดตั้ง
+- `public/sw.js` - แคชพื้นฐาน, handle push/message/notificationclick
+- `app/page.tsx` - UI เดโมและฟังก์ชันส่งแจ้งเตือน
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ทดสอบและ lint
+```bash
+npm run lint
+```
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ข้อจำกัด/ทิปส์
+- เสียง custom ยังตั้งผ่าน Notification API ไม่ได้ (ใช้เสียงระบบเท่านั้น)
+- ถ้าแจ้งเตือนยังไม่ขึ้น: ปิดโหมดห้ามรบกวน, ใช้หน้าต่างปกติ (ไม่ incognito), และอนุญาตที่ OS/เบราว์เซอร์
