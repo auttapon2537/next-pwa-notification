@@ -12,12 +12,14 @@ npm run build && npm run start   # โปรดเลือกพอร์ตว
 - เปิดบน `http://localhost` หรือ HTTPS เท่านั้น (Notification API ถูกบล็อกบน HTTP ปกติ)
 - เมื่อโหลดหน้าแรก จะมีสถานะ Permission / Service Worker / Manifest ให้ดู
 - กด Allow Notifications ในเบราว์เซอร์ ถ้าเคย Block ต้องเข้า Site settings แล้วเปลี่ยนเป็น Allow
-- ปุ่มเดโม:
-  - แจ้งเตือนทันที (client) / พร้อมภาพ
-  - แจ้งเตือนผ่าน service worker (คงอยู่แม้ย่อแท็บ)
-  - แจ้งเตือนมีปุ่ม action (เปิดแอป/เลื่อน)
-  - Badge + vibrate pattern
-  - ตั้งเวลา/จำลอง push ด้วย postMessage -> service worker
+- ปุ่มเดโม (ระบุ API/ออปชันที่ใช้):
+  - แจ้งเตือนทันที (Client) → ใช้ `ServiceWorkerRegistration.showNotification` (fallback เป็น `new Notification`) พร้อม `tag` สำหรับรวมซ้ำ
+  - พร้อมภาพตัวอย่าง → ใช้ `showNotification` + `image`
+  - คงอยู่แม้ย่อแท็บ → ใช้ `showNotification` + `requireInteraction`
+  - มีปุ่ม Action → ใช้ `showNotification` + `actions` และ handle ใน `notificationclick` ของ `sw.js`
+  - Badge + Vibration → ใช้ `showNotification` + `badge` + `vibrate`
+  - ตั้งเวลา/จำลอง Push → ส่ง `postMessage` ไป `sw.js` ให้เรียก `showNotification` หลัง `setTimeout`
+  - แจ้งเตือนเมื่อออกจากหน้า (หน่วง 3 วิ) → รอ 3 วินาที ถ้ายัง `document.visibilityState === "visible"` และ `document.hasFocus()` จะไม่แจ้งเตือน; ถ้าไม่อยู่หน้าแอปจะยิงผ่าน `showNotification`
 - ตรวจสอบ service worker: DevTools → Application → Service Workers ต้องเห็น `sw.js` เป็น activated
 
 ## โครงสร้าง PWA
